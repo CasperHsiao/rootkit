@@ -5,14 +5,10 @@
 
 void copyFile(char * srcFilename, char * destFilename) {
   FILE * srcFile = fopen(srcFilename, "r");
-  if (srcFile == NULL) {
-    printf("Failed to open file %s \n", srcFilename);
-    return;
-  }
   FILE * destFile = fopen(destFilename, "w");
-  if (destFile == NULL) {
-    printf("Failed to open file %s \n", destFilename);
-    return;
+  if (srcFile == NULL || destFile == NULL) {
+    printf("Failed to copy file\n");
+    exit(EXIT_FAILURE);
   }
   char c;
   while ((c = fgetc(srcFile)) != EOF) {
@@ -26,7 +22,7 @@ void writeFile(const char * filename, const char * toWrite) {
   FILE * f = fopen(filename, "w");
   if (f == NULL) {
     printf("Failed to open file %s \n", filename);
-    EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
   fprintf(f, "%s", toWrite);
   fclose(f);

